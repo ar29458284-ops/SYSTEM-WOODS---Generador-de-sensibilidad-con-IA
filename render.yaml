@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: system-woods-ai
+    runtime: node
+    plan: free
+    buildCommand: ""
+    startCommand: "node server.mjs"
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-5.6-luna

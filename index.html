@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#121117">
+<title>SYSTEM WOODS — Generador IA</title>
+<style>
+:root{
+  --bg:#0d0c11;--header:#15141b;--panel:#1b1a22;--card:#706e79;
+  --card2:#5d5b66;--white:#fff;--muted:#c7c4ce;--orange:#ff4b16;
+  --orange2:#ff7a18;--red:#ff2638;--line:#34313c;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  min-height:100vh;background:
+  radial-gradient(circle at 20% 0%,rgba(255,64,24,.10),transparent 30%),
+  radial-gradient(circle at 100% 35%,rgba(100,80,170,.12),transparent 35%),
+  var(--bg);color:var(--white);font-family:Arial,Helvetica,sans-serif;
+}
+button,select{font:inherit}
+.app{width:100%;max-width:540px;margin:auto;min-height:100vh;position:relative;overflow:hidden}
+header{
+  height:68px;background:var(--header);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;padding:0 17px;position:sticky;top:0;z-index:30
+}
+.menu-btn{border:0;background:none;color:#fff;font-size:29px;line-height:1;cursor:pointer;margin-right:15px}
+.logo{font-size:20px;letter-spacing:-1.2px}.logo span{color:var(--orange)}
+.session{margin-left:auto;font-size:10px}
+.progress{padding:21px 18px 0}
+.steps{display:flex;justify-content:space-between;font-size:9px;color:#eee;text-transform:uppercase}
+.bar{height:6px;border-radius:10px;background:#47444e;margin-top:8px;overflow:hidden}
+.fill{height:100%;width:25%;background:linear-gradient(90deg,var(--red),var(--orange2));transition:.25s}
+main{padding:25px 18px 45px}
+.screen{display:none}.screen.active{display:block}
+h1{text-align:center;font-size:25px;line-height:1.08;margin:19px 0 27px;text-transform:uppercase}
+h1 span{color:var(--orange)}
+.field{margin-bottom:17px}
+label{display:block;font-size:12px;margin:0 5px 8px;text-transform:uppercase}
+select{
+  width:100%;height:57px;border-radius:16px;border:1px solid #8f8b99;
+  background:#777581;color:#fff;padding:0 16px;outline:none;font-size:14px;font-weight:800
+}
+select option{background:#24222b;color:#fff}
+.btn{
+  width:100%;height:57px;border:0;border-radius:15px;background:#777581;color:#fff;
+  font-size:14px;font-weight:900;text-transform:uppercase;cursor:pointer
+}
+.btn.primary{background:linear-gradient(135deg,#ff3422,#ff6818);box-shadow:0 9px 25px rgba(255,70,20,.18)}
+.btn.secondary{margin-top:12px;background:#302e38;border:1px solid #4a4652}
+.choice{
+  min-height:112px;margin:13px 0;border-radius:17px;padding:19px;
+  background:linear-gradient(145deg,#777580,#65636f);border:1px solid #9996a1;
+  text-align:center;cursor:pointer;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;transition:.15s
+}
+.choice:active,.choice.active{transform:scale(.985);border-color:var(--orange);box-shadow:0 0 0 2px rgba(255,75,22,.17)}
+.icon{font-size:29px;margin-bottom:8px}.choice small{font-size:10px;color:#eee;margin-top:5px}
+.back{display:block;text-align:center;margin-top:23px;color:#ddd;font-size:12px;cursor:pointer}
+.result{margin-top:23px;border:1px solid #3d3945;border-radius:18px;background:#17161d;padding:17px}
+.result-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.result-title strong{font-size:14px}.badge{font-size:9px;padding:7px 9px;border-radius:20px;background:#3a2420;color:#ff774c}
+.sensi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sensi{
+  background:#292731;border:1px solid #403c48;border-radius:12px;padding:12px;
+  text-align:center
+}
+.sensi b{font-size:10px;color:#c8c4d0;display:block}.sensi strong{font-size:22px;color:#fff}
+.note{font-size:10px;color:#aaa6b2;line-height:1.5;margin-top:13px}
+.page-title{font-size:24px;text-align:left;margin:10px 0 8px}
+.page-sub{font-size:11px;color:#aaa6b2;line-height:1.5;margin-bottom:19px}
+.hud-card{
+  background:#18171e;border:1px solid #38343f;border-radius:18px;overflow:hidden;margin-bottom:18px
+}
+.hud-photo{
+  height:245px;position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 52%,rgba(255,74,22,.20),transparent 24%),
+    linear-gradient(145deg,#202331,#111218 62%,#2a1b19)
+}
+.phone{
+  position:absolute;width:145px;height:225px;left:50%;top:10px;transform:translateX(-50%);
+  border:5px solid #09090d;border-radius:19px;background:linear-gradient(145deg,#151924,#08090c);
+  box-shadow:0 0 0 2px #5c5962,0 12px 25px #000
+}
+.screenhud{position:absolute;inset:8px;border-radius:13px;background:#1d2631;overflow:hidden}
+.cross{position:absolute;left:50%;top:48%;width:20px;height:20px;transform:translate(-50%,-50%)}
+.cross:before,.cross:after{content:"";position:absolute;background:#fff8;width:2px;height:20px;left:9px}
+.cross:after{transform:rotate(90deg)}
+.hbtn{position:absolute;border-radius:50%;background:#e9edf033;border:1px solid #fff9}
+.hud2 .b1{width:38px;height:38px;right:12px;bottom:23px}.hud2 .b2{width:27px;height:27px;right:53px;bottom:47px}
+.hud2 .b3{width:22px;height:22px;left:12px;bottom:22px}.hud2 .b4{width:20px;height:20px;left:17px;top:23px}
+.hud3 .b1{width:36px;height:36px;right:11px;bottom:23px}.hud3 .b2{width:27px;height:27px;right:55px;bottom:52px}
+.hud3 .b3{width:28px;height:28px;left:12px;bottom:22px}.hud3 .b4{width:21px;height:21px;left:45px;bottom:39px}
+.hud3 .b5{width:19px;height:19px;left:13px;top:25px}
+.hud4 .b1{width:34px;height:34px;right:10px;bottom:20px}.hud4 .b2{width:27px;height:27px;right:51px;bottom:48px}
+.hud4 .b3{width:26px;height:26px;left:11px;bottom:21px}.hud4 .b4{width:23px;height:23px;left:44px;bottom:45px}
+.hud4 .b5{width:21px;height:21px;left:12px;top:25px}.hud4 .b6{width:19px;height:19px;right:14px;top:25px}
+.hud-info{padding:15px}.hud-info h3{font-size:15px;margin-bottom:6px}.hud-info p{font-size:10px;color:#aaa6b2;margin-bottom:12px}
+.code{
+  background:#0e0d12;border:1px solid #302c37;border-radius:10px;padding:11px;
+  font-family:monospace;font-size:11px;color:#ff7953;word-break:break-all
+}
+.copy{height:38px;margin-top:9px;background:#292631;border:1px solid #44404d;border-radius:10px;color:#fff;font-size:11px;font-weight:900;cursor:pointer;width:100%}
+.sensi-list{display:flex;flex-direction:column;gap:10px}
+.sensi-row{
+  display:flex;align-items:center;justify-content:space-between;background:#222029;
+  border:1px solid #38343f;border-radius:13px;padding:13px 15px
+}
+.sensi-row span{font-size:12px}.sensi-row b{font-size:20px;color:#ff7047}
+.tip{background:#1b191f;border:1px solid #3c3742;border-radius:15px;padding:14px;margin-top:17px}
+.tip b{font-size:12px}.tip p{font-size:10px;color:#aaa6b2;line-height:1.5;margin-top:6px}
+.drawer{
+  position:fixed;z-index:100;inset:0;display:none;background:rgba(0,0,0,.58)
+}
+.drawer.open{display:block}
+.drawer-panel{
+  width:min(310px,84vw);height:100%;background:#15141a;border-right:1px solid #3b3742;
+  padding:22px 15px;box-shadow:15px 0 35px #0008
+}
+.drawer-head{display:flex;align-items:center;padding:7px 7px 24px;border-bottom:1px solid #302d36}
+.close{margin-left:auto;background:none;border:0;color:#fff;font-size:27px}
+.nav{
+  width:100%;border:0;background:none;color:#fff;text-align:left;padding:17px 10px;
+  border-bottom:1px solid #2b2831;font-size:13px;font-weight:900;cursor:pointer
+}
+.nav span{color:#ff5b25;margin-right:9px}
+.small-footer{font-size:9px;color:#77737e;text-align:center;margin-top:28px;line-height:1.5}
+.toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+  background:#fff;color:#111;padding:11px 15px;border-radius:12px;font-size:11px;
+  opacity:0;pointer-events:none;transition:.2s;z-index:200
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:360px){h1{font-size:22px}.session{display:none}.phone{transform:translateX(-50%) scale(.9)}}
+
+.ai-status{display:inline-flex;align-items:center;gap:6px;font-size:9px;padding:7px 9px;border-radius:20px;background:#173321;color:#72f0a0;border:1px solid #2b6c43}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:#5dff8c;box-shadow:0 0 8px #5dff8c}
+.result-meta{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
+.meta-box{background:#222029;border:1px solid #3b3743;border-radius:12px;padding:11px;text-align:center}
+.meta-box b{display:block;font-size:9px;color:#aaa6b2;text-transform:uppercase;margin-bottom:5px}.meta-box strong{font-size:14px;color:#fff}
+.result-actions{display:grid;gap:10px;margin-top:14px}.btn.ai-blue{background:linear-gradient(135deg,#1597ff,#37c5ff);box-shadow:0 9px 25px rgba(30,160,255,.18)}.btn.ai-orange{background:linear-gradient(135deg,#ff4b16,#ff8b1f)}
+.loading{display:none;text-align:center;padding:14px;color:#c7c4ce;font-size:11px}.loading.show{display:block}.spinner{display:inline-block;width:13px;height:13px;border:2px solid #555;border-top-color:#ff5b25;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:7px}@keyframes spin{to{transform:rotate(360deg)}}
+.rec-device{font-size:10px;color:#aaa6b2;margin:0 0 13px}.menu-ai{margin:13px 10px 0;padding:11px;border:1px solid #3c3742;border-radius:12px;background:#1d1b22;font-size:10px;color:#bdb8c5;line-height:1.4}.menu-ai b{color:#fff;display:block;margin-bottom:4px}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <button class="menu-btn" onclick="openMenu()" aria-label="Abrir menú">☰</button>
+  <div class="logo">SYSTEM<span>WOODS</span></div>
+  <div class="session" id="aiHeaderStatus">COMPROBANDO IA…</div>
+</header>
+
+<div class="progress"><div class="steps"><span>DISP.</span><span>RANGO</span><span>DPI</span><span>BOTÓN</span></div><div class="bar"><div class="fill" id="fill"></div></div></div>
+
+<main>
+<section id="generator" class="screen active">
+  <h1>¿EN QUÉ JUEGA <span>?</span></h1>
+  <div class="field"><label>Marca</label>
+    <select id="brand" onchange="loadModels()"><option value="">Selecciona la marca...</option></select>
+  </div>
+  <div class="field"><label>Modelo exacto</label>
+    <select id="model"><option>Primero elige una marca</option></select>
+  </div>
+  <div class="field"><label>Tasa de refresco</label>
+    <select id="hz"><option value="60">60 Hz</option><option value="90">90 Hz</option><option value="120">120 Hz</option><option value="144">144 Hz</option><option value="165">165 Hz</option></select>
+  </div>
+  <button class="btn primary" onclick="nextStep()">SIGUIENTE</button>
+
+  <div id="styleStep" style="display:none">
+    <h1>¿CÓMO QUIERES LA <span>SENSI?</span></h1>
+    <div class="choice" onclick="generate('alta',this)"><div class="icon">⚡</div>ALTA<small>Más rápida para giros y arrastre</small></div>
+    <div class="choice" onclick="generate('media',this)"><div class="icon">♞</div>MEDIA<small>Equilibrio entre control y velocidad</small></div>
+    <div class="choice" onclick="generate('baja',this)"><div class="icon">🎯</div>BAJA<small>Más control para movimientos precisos</small></div>
+  </div>
+
+  <div id="result" class="result" style="display:none">
+    <div class="result-title"><strong>SENSIBILIDAD SYSTEM WOODS</strong><span class="ai-status"><i class="ai-dot"></i> IA REAL</span></div>
+    <div class="sensi-grid" id="sensiGrid"></div>
+    <div class="result-meta">
+      <div class="meta-box"><b>Rango</b><strong id="rangeValue">MEDIA</strong></div>
+      <div class="meta-box"><b>Botón mediano</b><strong id="buttonValue">48%</strong></div>
+      <div class="meta-box" style="grid-column:1/-1"><b>DPI</b><strong id="dpiValue">Sin DPI (Por defecto)</strong></div>
+    </div>
+    <p class="note" id="resultNote"></p>
+    <div class="loading" id="loading"><span class="spinner"></span>La IA está generando una nueva configuración…</div>
+    <div class="result-actions">
+      <button class="btn ai-blue" onclick="recommendCurrent()">★ RECOMENDAR SENSIBILIDAD</button>
+      <button class="btn ai-orange" onclick="regenerate()">↻ REGENERAR CON MISMO DISPOSITIVO</button>
+    </div>
+  </div>
+</section>
+
+<section id="hud" class="screen">
+  <h2 class="page-title">HUD <span style="color:#ff4b16">SYSTEM WOODS</span></h2>
+  <p class="page-sub">Configuraciones de 2, 3 y 4 dedos con una vista previa y su código para copiar.</p>
+
+  <div class="hud-card"><div class="hud-photo"><div class="phone"><div class="screenhud hud2"><i class="cross"></i><i class="hbtn b1"></i><i class="hbtn b2"></i><i class="hbtn b3"></i><i class="hbtn b4"></i></div></div></div>
+    <div class="hud-info"><h3>HUD de 2 dedos</h3><p>Sencillo y cómodo para empezar.</p><div class="code" id="code2">HUD-2-SW-7284-1936</div><button class="copy" onclick="copyCode('code2')">COPIAR CÓDIGO</button></div>
+  </div>
+
+  <div class="hud-card"><div class="hud-photo"><div class="phone"><div class="screenhud hud3"><i class="cross"></i><i class="hbtn b1"></i><i class="hbtn b2"></i><i class="hbtn b3"></i><i class="hbtn b4"></i><i class="hbtn b5"></i></div></div></div>
+    <div class="hud-info"><h3>HUD de 3 dedos</h3><p>Más botones accesibles sin perder control.</p><div class="code" id="code3">HUD-3-SW-5149-8273</div><button class="copy" onclick="copyCode('code3')">COPIAR CÓDIGO</button></div>
+  </div>
+
+  <div class="hud-card"><div class="hud-photo"><div class="phone"><div class="screenhud hud4"><i class="cross"></i><i class="hbtn b1"></i><i class="hbtn b2"></i><i class="hbtn b3"></i><i class="hbtn b4"></i><i class="hbtn b5"></i><i class="hbtn b6"></i></div></div></div>
+    <div class="hud-info"><h3>HUD de 4 dedos</h3><p>Distribución avanzada para mayor rapidez.</p><div class="code" id="code4">HUD-4-SW-9361-4058</div><button class="copy" onclick="copyCode('code4')">COPIAR CÓDIGO</button></div>
+  </div>
+  <p class="note">Nota: estos identificadores son ejemplos de la página. Un código HUD válido debe corresponder al formato que acepte la versión actual del juego; el diseño no puede garantizar que un código inventado sea importable.</p>
+</section>
+
+<section id="recommended" class="screen">
+  <h2 class="page-title">Sensibilidades <span style="color:#ff4b16">recomendadas</span></h2>
+  <p class="page-sub">Recomendaciones generadas por la IA para el dispositivo que hayas seleccionado.</p><p class="rec-device" id="recDevice">Todavía no hay un dispositivo generado.</p><button class="btn primary" style="margin-bottom:14px" onclick="recommendCurrent()">★ RECOMENDAR SENSIBILIDAD</button>
+  <div class="sensi-list" id="recommendedList"><div class="sensi-row"><span>General</span><b>—</b></div><div class="sensi-row"><span>Punto rojo</span><b>—</b></div><div class="sensi-row"><span>Mira 2X</span><b>—</b></div><div class="sensi-row"><span>Mira 4X</span><b>—</b></div><div class="sensi-row"><span>Mira AWM</span><b>—</b></div><div class="sensi-row"><span>Cámara libre</span><b>—</b></div></div>
+  <div class="tip"><b>⚙️ ¿Quieres una configuración personalizada?</b><p>Ve a Generador IA, selecciona marca, modelo y tasa de refresco. SYSTEM WOODS ajustará los valores de referencia según esos datos.</p></div>
+</section>
+</main>
+</div>
+
+<div id="drawer" class="drawer" onclick="closeMenu(event)">
+  <div class="drawer-panel" onclick="event.stopPropagation()">
+    <div class="drawer-head"><div class="logo">SYSTEM<span>WOODS</span></div><button class="close" onclick="closeMenu()">×</button></div>
+    <button class="nav" onclick="showPage('generator')"><span>◈</span> Generador IA</button>
+    <button class="nav" onclick="showPage('hud')"><span>⌘</span> HUD 2 / 3 / 4 dedos</button>
+    <button class="nav" onclick="showPage('recommended')"><span>◉</span> Sensibilidades recomendadas</button><div class="menu-ai" id="menuAiStatus"><b>COMPROBANDO IA…</b>Verificando la conexión con el servidor de IA.</div>
+    <button class="nav" onclick="showPage('generator')"><span>↻</span> Nueva configuración</button>
+    <div class="small-footer">SYSTEM WOODS<br>Generador de sensibilidad y HUD</div>
+  </div>
+</div>
+<div id="toast" class="toast">Copiado</div>
+
+<script>
+const data={
+ Samsung:["Galaxy A05","Galaxy A05s","Galaxy A06","Galaxy A14","Galaxy A15","Galaxy A16","Galaxy A23","Galaxy A24","Galaxy A25","Galaxy A32","Galaxy A33","Galaxy A34","Galaxy A35 5G","Galaxy A52","Galaxy A52s","Galaxy A53","Galaxy A54","Galaxy A55 5G","Galaxy S20","Galaxy S20 FE","Galaxy S21","Galaxy S21 FE","Galaxy S22","Galaxy S22+","Galaxy S22 Ultra","Galaxy S23","Galaxy S23+","Galaxy S23 Ultra","Galaxy S24","Galaxy S24+","Galaxy S24 Ultra","Galaxy S25","Galaxy S25+","Galaxy S25 Ultra","Galaxy Note 20","Galaxy Note 20 Ultra","Galaxy Z Flip 3","Galaxy Z Flip 4","Galaxy Z Flip 5","Galaxy Z Flip 6","Galaxy Z Fold 3","Galaxy Z Fold 4","Galaxy Z Fold 5","Galaxy Z Fold 6"],
+ Apple:["iPhone 11","iPhone 12","iPhone 12 Pro","iPhone 13","iPhone 13 Pro","iPhone 14","iPhone 14 Pro","iPhone 15","iPhone 15 Pro","iPhone 16","iPhone 16 Pro"],
+ Xiaomi:["Redmi 9","Redmi 10","Redmi Note 10","Redmi Note 11","Redmi Note 12","Redmi Note 13","POCO X3 Pro","POCO X4 Pro","POCO X5 Pro","POCO X6","POCO X6 Pro","Xiaomi 13","Xiaomi 14"],
+ Motorola:["Moto G22","Moto G32","Moto G52","Moto G54","Moto G84","Edge 30","Edge 40","Edge 50"],
+ HONOR:["X7","X8","X9","90 Lite","90","200 Lite","200"],
+ Infinix:["Hot 11","Hot 12","Hot 20","Hot 30","Hot 40","Note 12","Note 30","GT 10 Pro","GT 20 Pro"],
+ Realme:["C35","C55","C67","10 Pro","11 Pro","12 Pro+","GT Neo 3","GT 6"],
+ OPPO:["A57","A58","A78","A98","Reno 8","Reno 10","Reno 11","Reno 12"],
+ ASUS:["ROG Phone 5","ROG Phone 6","ROG Phone 7","ROG Phone 8","Zenfone 9","Zenfone 10"],
+ Google:["Pixel 6","Pixel 6a","Pixel 7","Pixel 7a","Pixel 8","Pixel 8a","Pixel 9"],
+ ZTE:["nubia Neo","nubia RedMagic 7","RedMagic 8 Pro","RedMagic 9 Pro"],
+ Huawei:["P30","P40","Nova 9","Nova 10","Nova 11"],
+ Lenovo:["Legion Phone Duel","Legion Y70"],
+ BlackShark:["Black Shark 4","Black Shark 5","Black Shark 6","Black Shark 6 Pro"],
+ Tecno:["Spark 10","Spark 20","Pova 5","Pova 6","Camon 20","Camon 30"],
+ Vivo:["Y21","Y22","Y36","V23","V25","V29","V30"],
+ OnePlus:["Nord 2","Nord 3","OnePlus 10 Pro","OnePlus 11","OnePlus 12"]
+};
+async function checkAI(){
+ try{
+   const r=await fetch('/api/health',{cache:'no-store'});
+   const d=await r.json();
+   const header=document.getElementById('aiHeaderStatus');
+   const menu=document.getElementById('menuAiStatus');
+   if(d.aiConfigured){
+     if(header) header.textContent='IA REAL · CONECTADA';
+     if(menu) menu.innerHTML='<b>IA REAL CONECTADA</b>Modelo: '+String(d.model||'OpenAI')+'. Las recomendaciones se generan en el servidor.';
+   }else{
+     if(header) header.textContent='IA · SIN CONFIGURAR';
+     if(menu) menu.innerHTML='<b>IA SIN CONFIGURAR</b>Falta OPENAI_API_KEY en el servidor.';
+   }
+ }catch(e){
+   const header=document.getElementById('aiHeaderStatus');
+   const menu=document.getElementById('menuAiStatus');
+   if(header) header.textContent='IA · SERVIDOR OFFLINE';
+   if(menu) menu.innerHTML='<b>IA NO DISPONIBLE</b>Inicia el servidor para usar la generación real.';
+ }
+}
+const brand=document.getElementById('brand');
+Object.keys(data).sort().forEach(b=>brand.add(new Option(b,b)));
+function loadModels(){
+ const m=document.getElementById('model');m.innerHTML='';
+ (data[brand.value]||[]).forEach(x=>m.add(new Option(x,x)));
+ if(!data[brand.value])m.add(new Option('Primero elige una marca',''));
+}
+function nextStep(){
+ if(!brand.value||!document.getElementById('model').value){alert('Selecciona una marca y un modelo.');return}
+ document.getElementById('styleStep').style.display='block';
+ document.getElementById('fill').style.width='50%';
+ document.getElementById('styleStep').scrollIntoView({behavior:'smooth'});
+}
+async function generate(level,el,forceDifferent=false){
+ document.querySelectorAll('.choice').forEach(x=>x.classList.remove('active')); if(el) el.classList.add('active');
+ const hz=+document.getElementById('hz').value, deviceModel=document.getElementById('model').value;
+ const loading=document.getElementById('loading'); loading.classList.add('show');
+ try{
+   const previous=window.lastAIResult||null;
+   const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({brand:brand.value,model:deviceModel,hz,level,previous,forceDifferent})});
+   const data=await res.json(); if(!res.ok) throw new Error(data.error||'No se pudo conectar con la IA.');
+   window.lastAIResult=data; window.lastLevel=level;
+   const vals={'General':data.general,'Punto rojo':data.redDot,'Mira 2X':data.scope2x,'Mira 4X':data.scope4x,'Mira AWM':data.awm,'Cámara libre':data.freeCamera};
+   const grid=document.getElementById('sensiGrid'); grid.innerHTML='';
+   Object.entries(vals).forEach(([k,v])=>grid.innerHTML+=`<div class="sensi"><b>${k}</b><strong>${v}</strong></div>`);
+   document.getElementById('rangeValue').textContent=String(data.range||'media').toUpperCase();
+   document.getElementById('buttonValue').textContent=(data.buttonSize||48)+'%';
+   document.getElementById('dpiValue').textContent=data.dpi||'Sin DPI (Por defecto)';
+   document.getElementById('resultNote').textContent=`IA real · ${brand.value} ${deviceModel} · ${hz} Hz · ${data.explanation||''}`;
+   updateRecommended(data);
+   document.getElementById('result').style.display='block'; document.getElementById('fill').style.width='100%';
+   document.getElementById('result').scrollIntoView({behavior:'smooth'});
+ }catch(err){ alert('No se pudo generar con IA real. '+err.message+'\n\nAsegúrate de iniciar el servidor con OPENAI_API_KEY configurada.'); }
+ finally{loading.classList.remove('show');}
+}
+function updateRecommended(data){
+ const list=document.getElementById('recommendedList'); if(!list) return;
+ const vals=[['General',data.general],['Punto rojo',data.redDot],['Mira 2X',data.scope2x],['Mira 4X',data.scope4x],['Mira AWM',data.awm],['Cámara libre',data.freeCamera]];
+ list.innerHTML=vals.map(([k,v])=>`<div class="sensi-row"><span>${k}</span><b>${v}</b></div>`).join('');
+ const rd=document.getElementById('recDevice'); if(rd) rd.textContent=`${brand.value} ${document.getElementById('model').value} · ${document.getElementById('hz').value} Hz · Rango ${String(data.range).toUpperCase()} · Botón ${data.buttonSize}% · ${data.dpi}`;
+}
+async function recommendCurrent(){
+ if(!brand.value||!document.getElementById('model').value){showPage('generator'); alert('Primero selecciona una marca y un modelo.'); return;}
+ const level=window.lastLevel||'media';
+ document.getElementById('styleStep').style.display='block';
+ const choices=document.querySelectorAll('.choice');
+ const el=[...choices].find(x=>x.textContent.toLowerCase().includes(level))||choices[1];
+ await generate(level,el,true);
+ showPage('recommended');
+ updateRecommended(window.lastAIResult);
+}
+function regenerate(){
+ const choices=document.querySelectorAll('.choice');
+ const level=window.lastLevel||'media';
+ const el=[...choices].find(x=>x.textContent.toLowerCase().includes(level))||choices[1];
+ generate(level,el,true);
+}
+function openMenu(){document.getElementById('drawer').classList.add('open')}
+function closeMenu(e){if(!e||e.target===document.getElementById('drawer'))document.getElementById('drawer').classList.remove('open')}
+function showPage(id){
+ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ document.getElementById('drawer').classList.remove('open');
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+checkAI();
+
+function copyCode(id){
+ const text=document.getElementById(id).textContent;
+ navigator.clipboard?.writeText(text).catch(()=>{});
+ const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1200);
+}
+</script>
+</body>
+</html>
